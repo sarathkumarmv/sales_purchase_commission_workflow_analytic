@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+
+
+        <!--SALES TREE-->
+
+         <record model="ir.ui.view" id="sales_sopo_tree">
+            <field name="model">sale.order</field>
+            <field name="name">view.inherit.sale.order.sopo.tree</field>
+            <field name="inherit_id" ref="sale.view_order_tree"/>
+            <field name="arch" type="xml">
+                  <xpath expr="//tree/field[@name='date_order']" position="after" >
+                        <field name="project"/>
+                        <field name="contract"/>
+                        <field name ="order_type" />
+                        <field name ="staff" />
+                        <field name="project_id" position="attributes">
+                            <attribute name="required">True</attribute>
+                            <attribute name="domain">[('parent_id', 'ilike', 'ordernumber')]</attribute>
+                        </field>
+                  </xpath>
+            </field>
+        </record>
+
+
+        <!--SALES FORM-->
+
+        <record model="ir.ui.view" id="sales_sopo_form">
+            <field name="model">sale.order</field>
+            <field name="name">view.inherit.sale.order.sopo.form</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/group/group/field[@name='partner_id']" position="before" >
+                   <field name="project"/>
+                   <field name="contract"/>
+                   <field name ="order_type" />
+                   <field name ="staff" />
+                </xpath>
+                <field name="project_id" position="attributes">
+                    <attribute name="required">True</attribute>
+                    <attribute name="domain">[('parent_id', 'ilike', 'ordernumber')]</attribute>
+                </field>
+                        <!--prepare&approve-->
+                <xpath expr="/form/sheet/notebook/page/group/field[@name='amount_total']" position="after" >
+                    <field name="prepared_by"/>
+                    <field name="approved_by"/>
+                    <button name="button_preparer" type="object" string="Preparer" groups="sailpurchase.group_commission_preparation" />
+                    <button name="button_approver" type="object" string="Approver" groups="sailpurchase.group_commission_approval"/>
+                </xpath>
+
+
+            </field>
+        </record>
+
+
+        <!--SALES TAB-->
+
+                <!--Related Purchase Order-->
+
+        <record model="ir.ui.view" id="view_tab_sopo_tree" >
+            <field name="model">sale.order</field>
+            <field name="name">view.inherit.sale.order.sopo.tab.tree</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook/page[@string='Other Information']" position='after'>
+                    <page string="Related Purchase Order">
+                        <field name="sale_order" />
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+
+                <!--Salesman Commision-->
+
+         <record model="ir.ui.view" id="view_tab2_sopo_tree" >
+            <field name="model">sale.order</field>
+            <field name="name">view.inherit.sale.order.sopo.tab2.tree</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="/form/sheet/notebook/page[@string='Other Information']" position='after'>
+                    <page string="Salesmen Commission">
+                        <field name="sales_commission" />
+                    </page>
+                </xpath>
+            </field>
+        </record>
+        <record model="ir.ui.view" id="sales_commission_tree">
+            <field name="name">sales.commision.tree</field>
+            <field name="model">sales.commission</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                     <tree editable= "bottom">
+                                <field name="user"/>
+                                <field name="sales_value"/>
+                                <field name="percent"/>
+                                <field name="commission"/>
+                     </tree>
+            </field>
+        </record>
+
+
+        <!--GROUP-->
+            <!--commission-->
+        <record model="ir.module.category" id="commission_group">
+            <field name="name">Commission</field>
+        </record>
+        <record id="group_commission" model="res.groups">
+            <field name="name">Commission Group</field>
+            <field name="category_id" ref="commission_group"/>
+        </record>
+
+                <!--Approval-->
+        <record model="ir.module.category" id="commission_preparation">
+            <field name="name">Commission Preparation</field>
+        </record>
+        <record id="group_commission_preparation" model="res.groups">
+            <field name="name">Commission Preparation</field>
+            <field name="category_id" ref="commission_preparation"/>
+        </record>
+
+                <!--Prepare-->
+        <record model="ir.module.category" id="commission_approval">
+            <field name="name">Commission Approval</field>
+        </record>
+        <record id="group_commission_approval" model="res.groups">
+            <field name="name">Commission Approval</field>
+            <field name="category_id" ref="commission_approval"/>
+        </record>
+
+
+
+
+        <!--PURCHASE FORM-->
+
+         <record model="ir.ui.view" id="purchase_purch_form">
+            <field name="model">purchase.order</field>
+            <field name="name">view.inherit.purchase.order.purch.form</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <xpath expr="/form/sheet/group/group/field[@name='dest_address_id']" position="after" >
+                   <group>
+                        <field name="related_sale" on_change="gett(related_sale)"/>
+                        <field name="contractno"/>
+                        <field name ="order_type" />
+                        <field name ="staff" />
+                   </group>
+               </xpath>
+               <field name="account_analytic_id" position="attributes">
+                    <attribute name="required">True</attribute>
+                    <attribute name="domain">[('parent_id', 'ilike', 'ordernumber')]</attribute>
+               </field>
+            </field>
+        </record>
+
+
+        <!--PURCHASE TREE-->
+
+        <record model="ir.ui.view" id="purchase_purch_tree">
+            <field name="model">purchase.order</field>
+            <field name="name">view.inherit.purchase.order.purch.tree</field>
+            <field name="inherit_id" ref="purchase.purchase_order_tree"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//tree/field[@name='date_order']" position="after" >
+                       <field name="related_sale" />
+                       <field name="contractno"/>
+                       <field name ="order_type" />
+                       <field name ="staff" />
+                 </xpath>
+            </field>
+        </record>
+
+
+        <!--INVOICE FORM-->
+
+        <record model="ir.ui.view" id="account_invoice_form">
+            <field name="model">account.invoice</field>
+            <field name="name">view.inherit.account.invoice.form</field>
+            <field name="inherit_id" ref="account.invoice_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <xpath expr="/form/sheet/group/group/field[@name='account_id']" position="after" >
+                        <field name ="order_type" />
+                        <field name ="staff" />
+
+               </xpath>
+               <field name="account_analytic_id" position="attributes">
+                    <attribute name="required">True</attribute>
+                    <attribute name="domain">[('parent_id', 'ilike', 'ordernumber')]</attribute>
+               </field>
+            </field>
+        </record>
+
+
+        <!--INVOICE TREE-->
+
+        <record model="ir.ui.view" id="account_invoice_tree">
+            <field name="model">account.invoice</field>
+            <field name="name">view.inherit.account.invoice.tree</field>
+            <field name="inherit_id" ref="account.invoice_tree"/>
+            <field name="arch" type="xml">
+                 <xpath expr="//tree/field[@name='reference']" position="after" >
+
+                       <field name ="order_type" />
+                       <field name ="staff" />
+
+                 </xpath>
+            </field>
+        </record>
+
+
+        <!--WORKFLOW CUSTOMIZATION-->
+
+        <record id="my_quotation_form" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+              <xpath expr="/form/header/field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar" statusbar_visible="draft,quotation_approved,quotation_second,quotation_validate,sent,progress,manual,done" />
+              </xpath>
+                <button name="action_quotation_send" position="before">
+                    <button name="approve_quotation" string="To Check" states="draft" class="oe_highlight" groups="base.group_user"/>
+                    <button name="approve_quotation_second" string="Checked" states="quotation_approved" type="workflow" class="oe_highlight" groups="base.group_user"/>
+                    <button name="approve_quotation_validate" string="Approve" states="quotation_second" type="workflow" class="oe_highlight" groups="base.group_user"/>
+                </button>
+                <button name="action_quotation_send" position="attributes">
+                    <attribute name="states">quotation_approved,quotation_second,quotation_validate,sent</attribute>
+                </button>
+                <button name="print_quotation" position="attributes">
+                    <attribute name="states">quotation_approved,sent</attribute>
+                </button>
+                <button name="action_button_confirm" position="attributes">
+                    <attribute name="states">quotation_validate</attribute>
+                </button>
+
+
+
+            </field>
+        </record>
+
+                 <!--Activity-->
+         <record id="act_quotation_approved" model="workflow.activity">
+            <field name="wkf_id" ref="sale.wkf_sale"/>
+            <field name="name">To check</field>
+            <field name="kind">function</field>
+            <field name="action">action_quotation_approved()</field>
+        </record>
+
+        <record id="act_quotation_approved_second" model="workflow.activity">
+            <field name="wkf_id" ref="sale.wkf_sale"/>
+            <field name="name">Checked</field>
+            <field name="kind">function</field>
+            <field name="action">action_quotation_approve_second()</field>
+        </record>
+
+        <record id="act_quotation_approve_validate" model="workflow.activity">
+            <field name="wkf_id" ref="sale.wkf_sale"/>
+            <field name="name">Approved</field>
+            <field name="kind">function</field>
+            <field name="action">action_quotation_approve_validate()</field>
+        </record>
+
+        <record id="act_confirm" model="workflow.activity">
+            <field name="wkf_id" ref="sale.wkf_sale"/>
+            <field name="name">Confirm</field>
+            <field name="kind">function</field>
+            <field name="action">()</field>
+        </record>
+
+                <!--Transition-->
+        <record id="trans_quotation_draft_to_approved" model="workflow.transition">
+            <field name="act_from" ref="sale.act_draft"/>
+            <field name="act_to" ref="act_quotation_approved"/>
+            <field name="signal">approve_quotation</field>
+        </record>
+        <record id="trans_quotation_tocheck_to_checked_second" model="workflow.transition">
+            <field name="act_from" ref="act_quotation_approved"/>
+            <field name="act_to" ref="act_quotation_approved_second"/>
+            <field name="signal">approve_quotation_second</field>
+        </record>
+        <record id="trans_quotation_checked_to_approve" model="workflow.transition">
+            <field name="act_from" ref="act_quotation_approved_second"/>
+            <field name="act_to" ref="act_quotation_approve_validate"/>
+            <field name="signal">approve_quotation_validate</field>
+        </record>
+        <record id="trans_quotation_approve_to_confirm" model="workflow.transition">
+            <field name="act_from" ref="act_quotation_approve_validate"/>
+            <field name="act_to" ref="sale.act_router"/>
+            <field name="signal">order_confirm</field>
+        </record>
+    </data>
+</openerp>
