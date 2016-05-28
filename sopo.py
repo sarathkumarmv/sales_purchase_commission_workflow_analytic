@@ -87,22 +87,13 @@ class passinvoice(models.Model):
         return res
 
 class stock_move(models.Model):
-    _inherit = 'stock.move'
 
+    _inherit = "stock.picking"
 
-    def _get_invoice_line_vals(self, cr, uid, move, partner, inv_type, context=None):
+    def _get_invoice_vals(self, cr, uid, key, inv_type, journal_id, move, context=None):
         print ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>", self
-        res = super(stock_move, self)._get_invoice_line_vals(cr, uid, move, partner, inv_type, context=context)
-        # sale_line = move.procurement_id.sale_line_id
-        # res.update({'order_type': sale_line.order_id.order_type.id, 'staff': sale_line.order_id.staff.id})
-
-        if inv_type in ('out_invoice', 'out_refund') and move.procurement_id and move.procurement_id.sale_line_id:
-            sale_line = move.procurement_id.sale_line_id
-            res['order_type'] = sale_line.order_id.order_type and sale_line.order_id.order_type.id or False
-            res['staff'] = sale_line.order_id.staff and sale_line.order_id.staff.id or False
-
-        # res = super(deliveryinvoice, self)._prepare_order_line_procurement(cr, uid, order, line,group_id= group_id, context=context)
-        # res.update({'order_type': order.order_type.id,'staff': order.staff.id})
-
+        res = super(stock_move, self)._get_invoice_vals(cr, uid, key, inv_type, journal_id, move, context=context)
+        sale = move.picking_id.sale_id
+        if sale and inv_type in ('out_invoice', 'out_refund'):
+            res.update({'order_type': sale.order_type.id,'staff': sale.staff.id})
         return res
-
